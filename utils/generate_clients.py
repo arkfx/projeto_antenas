@@ -6,7 +6,7 @@ import math
 from random import Random
 from typing import Sequence
 
-from .. import config
+import config
 
 
 def _generate_clients(count: int, rng: Random, cluster_count: int) -> list[tuple[str, int, int]]:
@@ -30,7 +30,7 @@ def _generate_clients(count: int, rng: Random, cluster_count: int) -> list[tuple
         cluster_sizes[rng.randrange(cluster_count)] += 1
 
     clusters = [
-        (rng.uniform(0, width), rng.uniform(0, height), rng.uniform(0.01, 0.05) * shortest_side)
+        (rng.uniform(0, width), rng.uniform(0, height), rng.uniform(0.025, 0.05) * shortest_side)
         for _ in range(cluster_count)
     ]
 

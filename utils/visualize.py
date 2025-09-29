@@ -5,25 +5,12 @@ import csv
 import re
 from pathlib import Path
 from typing import Any, Sequence
-
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
 from matplotlib.axes import Axes
 from matplotlib.patches import Circle
 import numpy as np
-
-try:  # pragma: no cover - fallback for direct execution
-    from .. import config
-except ImportError:  # pragma: no cover - executed when run as script
-    import sys
-
-    _PACKAGE_ROOT = Path(__file__).resolve().parents[1]
-    _PROJECT_ROOT = _PACKAGE_ROOT.parent
-    if str(_PROJECT_ROOT) not in sys.path:
-        sys.path.insert(0, str(_PROJECT_ROOT))
-
-    from projeto_antenas import config  # type: ignore[import]  # noqa: E402
-
+import config
 
 def _load_clients(csv_path: Path) -> tuple[np.ndarray, np.ndarray]:
     x_coords: list[int] = []
@@ -167,7 +154,7 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         "--bins",
         type=int,
         default=100,
-        help="Número de divisões em cada eixo para o histograma 2D (padrão: 50).",
+        help="Número de divisões em cada eixo para o histograma 2D (padrão: 100).",
     )
     parser.add_argument(
         "--cmap",

@@ -3,9 +3,9 @@
 from __future__ import annotations
 from pathlib import Path
 
-from . import config
-from .genetic_algorithm import GeneticAlgorithm, Individual
-from .problem_domain import Problem, load_clients, Client
+import config
+from genetic_algorithm import GeneticAlgorithm, Individual
+from problem_domain import Problem, load_clients, Client
 
 
 def _gerar_e_salvar_relatorio(

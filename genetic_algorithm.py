@@ -7,8 +7,8 @@ import sys
 from dataclasses import dataclass, replace
 from typing import List, Sequence, Tuple
 
-from . import config
-from .problem_domain import Problem
+import config
+from problem_domain import Problem
 
 
 @dataclass(slots=True)
@@ -158,8 +158,8 @@ class GeneticAlgorithm:
         if length < 3:
             return parent_a[:], parent_b[:]
         
-        # Escolhe dois pontos de corte distintos e ordenados.
-        p1, p2 = sorted(self._rng.sample(range(1, length), 2))
+        # Escolhe dois pontos de corte distintos e ordenados.              
+        p1, p2 = sorted(self._rng.sample(range(1, length), 2)) 
         
         # Cria os filhos trocando o segmento central.
         child1 = parent_a[:p1] + parent_b[p1:p2] + parent_a[p2:]

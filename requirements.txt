@@ -1,0 +1,8 @@
+# Dependencies for projeto_antenas - Genetic Algorithm for Antenna Placement
+# Python 3.8+
+
+# Numerical computing and vectorization
+numpy>=1.21.0,<2.0.0
+
+# Visualization utilities
+matplotlib>=3.5.0,<4.0.0

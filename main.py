@@ -2,10 +2,39 @@
 
 from __future__ import annotations
 from pathlib import Path
+from typing import Sequence
 
 import config
 from genetic_algorithm import GeneticAlgorithm, Individual
 from problem_domain import Problem, load_clients, Client
+
+
+def _formatar_cromossomo_por_antena(
+    problem: Problem,
+    genes: Sequence[int],
+) -> str:
+    """Gera uma representação separada dos bits por antena e coordenada."""
+    genes_per_coord = problem.bits_per_coord
+    genes_per_antenna = genes_per_coord * 2
+    decoded_coords = problem.decode(genes)
+
+    linhas = []
+    for idx, (x_coord, y_coord) in enumerate(decoded_coords, start=1):
+        start = (idx - 1) * genes_per_antenna
+        mid = start + genes_per_coord
+        end = start + genes_per_antenna
+
+        x_bits = "".join(str(bit) for bit in genes[start:mid])
+        y_bits = "".join(str(bit) for bit in genes[mid:end])
+        x_val = int(x_bits, 2)
+        y_val = int(y_bits, 2)
+
+        linhas.append(
+            f"  Antena {idx:02d}: x_bits={x_bits} ({x_val}); "
+            f"y_bits={y_bits} ({y_val});"
+        )
+
+    return "\n".join(linhas)
 
 
 def _gerar_e_salvar_relatorio(
@@ -14,11 +43,13 @@ def _gerar_e_salvar_relatorio(
     best_individual: Individual,
 ) -> Path:
     """Gera um relatório completo da execução e o salva em um arquivo de texto."""
-    # Decodifica as coordenadas do melhor indivíduo encontrado
     best_coordinates = problem.decode(best_individual.genes)
     bits_as_str = "".join(str(bit) for bit in best_individual.genes)
+    cromossomo_separado = _formatar_cromossomo_por_antena(
+        problem,
+        best_individual.genes,
+    )
 
-    # Monta as seções do relatório usando f-strings multilinhas para clareza
     resumo_execucao = f"""
 === Resultado da Otimização ===
 Clientes totais: {len(problem.clients)}
@@ -35,6 +66,8 @@ Posições das antenas (x, y):
     resumo_execucao += f"""
 Cromossomo binário:
 {bits_as_str}
+Cromossomo separado por antena e coordenada (bits -> valor):
+{cromossomo_separado}
 """
 
     params_ga = f"""
@@ -57,7 +90,7 @@ MAP_HEIGHT: {config.MAP_HEIGHT}
 ANTENNA_RADIUS: {config.ANTENNA_RADIUS}
 """
     # Junta todas as seções em um único texto
-    conteudo_final = resumo_execucao.strip() + "\n" + params_ga.strip() + "\n" + params_problema.strip()
+    conteudo_final = resumo_execucao.strip() + "\n\n" + params_ga.strip() + "\n\n" + params_problema.strip()
 
     # Define o caminho e salva o arquivo
     output_file = config.CLIENT_DATA_FILE.parent / "relatorio_execucao.txt"

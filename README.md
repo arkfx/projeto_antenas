@@ -60,7 +60,7 @@ A implementação do Algoritmo Genético segue uma abordagem clássica, detalhad
 
 1. (Opcional) Gerar Novos Dados de Clientes:  
    Você pode criar um novo arquivo clients.csv com uma distribuição diferente.  
-   python \-m utils.generate\_clients \--count 500 \--clusters 5
+   python \-m utils.generate\_clients \--count 1000 \--clusters 6
 
    Use python \-m utils.generate\_clients \--help para ver todas as opções.  
 2. Executar a Otimização:  

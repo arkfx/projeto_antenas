@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
-from math import hypot
 from pathlib import Path
 from typing import Sequence
+
+import numpy as np
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,6 +55,11 @@ class Problem:
         self.map_height = map_height
         self.coverage_radius = coverage_radius
         self.chromosome_length = num_antennas * bits_per_coord * 2
+        self._clients_array = np.array(
+            [(client.x, client.y) for client in clients],
+            dtype=float,
+        )
+        self._radius_sq = float(coverage_radius) ** 2
 
     def decode(self, genes: Sequence[int]) -> list[tuple[int, int]]:
         """Converte um cromossomo binário em coordenadas de antenas."""
@@ -75,25 +81,19 @@ class Problem:
 
     def calculate_fitness(self, genes: Sequence[int]) -> int:
         """Avalia o fitness como o número de clientes distintos cobertos."""
-        antenna_positions = self.decode(genes)
-        return sum(
-            1 for client in self.clients
-            if _is_client_covered(client, antenna_positions, self.coverage_radius)
-        )
+        if self._clients_array.size == 0:
+            return 0
+
+        antenna_positions = np.asarray(self.decode(genes), dtype=float)
+        if antenna_positions.size == 0:
+            return 0
+
+        deltas = self._clients_array[:, None, :] - antenna_positions[None, :, :]
+        distances_sq = np.square(deltas, dtype=float).sum(axis=2)
+        covered = np.any(distances_sq <= self._radius_sq, axis=1)
+        return int(np.count_nonzero(covered))
 
 
 def _bits_to_int(bits: Sequence[int]) -> int:
     """Converte uma sequência de bits (0 e 1) para um inteiro."""
     return int("".join(map(str, bits)), 2)
-
-
-def _is_client_covered(
-    client: Client,
-    antenna_positions: Sequence[tuple[int, int]],
-    coverage_radius: float,
-) -> bool:
-    """Verifica se um cliente está dentro do raio de qualquer antena."""
-    return any(
-        hypot(client.x - x_ant, client.y - y_ant) <= coverage_radius
-        for x_ant, y_ant in antenna_positions
-    )
